@@ -8,17 +8,9 @@ version: "${VERSION}"
 section: "default"
 priority: "optional"
 
-# snapscreen drives KDE Spectacle (Wayland-compatible); the sound/clipboard
-# helpers are optional and only used when PLAYSOUND / CLIPBOARD are enabled.
-depends:
-- kde-spectacle
-recommends:
-- alsa-utils
-- wl-clipboard
-
 maintainer: "Andres Bott <contact@andresbott.com>"
 description: |
-  Mixed up linux scripts: snapscreen
+  Mixed up linux scripts
 license: "Mixed"
 
 contents:
@@ -29,21 +21,6 @@ contents:
 # bash completion (autoloaded by bash-completion)
 - src: ./completions/candy.bash
   dst: /usr/share/bash-completion/completions/candy
-
-# snapscreen assets
-- src: ./share/snapscreen/shutter.wav
-  dst: /usr/local/share/snapscreen/shutter.wav
-
-- src: ./share/snapscreen/snapscreen.conf
-  dst: /etc/snapscreen.conf
-
-# KDE global-shortcut launchers: kglobalaccel reads X-KDE-Shortcuts from these
-# and registers the default shortcuts (users can override in System Settings).
-- src: ./share/applications/com.andresbott.candy.snapscreen-selection.desktop
-  dst: /usr/share/applications/com.andresbott.candy.snapscreen-selection.desktop
-
-- src: ./share/applications/com.andresbott.candy.snapscreen-window.desktop
-  dst: /usr/share/applications/com.andresbott.candy.snapscreen-window.desktop
 
 overrides:
   deb:

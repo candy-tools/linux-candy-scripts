@@ -19,15 +19,6 @@ _candy() {
 
     cmd="${COMP_WORDS[1]}"
     case "$cmd" in
-        snapscreen)
-            case "$prev" in
-                -t|--type)
-                    mapfile -t COMPREPLY < <(compgen -W "s w" -- "$cur")
-                    return
-                    ;;
-            esac
-            mapfile -t COMPREPLY < <(compgen -W "-t --type -h --help" -- "$cur")
-            ;;
         topsize)
             case "$cur" in
                 -*) mapfile -t COMPREPLY < <(compgen -W "-n -d -f -h --help" -- "$cur") ;;
