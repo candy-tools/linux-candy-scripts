@@ -35,14 +35,30 @@ jobs:
             --title "${{ github.ref_name }}" \
             --generate-notes
 
-      # publish to the APT repo. the .deb was built into dist/ and attached to the
-      # GitHub release above; this action writes packages/linux-candy.json in
-      # candy-tools/debian-repo and pushes it, which triggers that repo's publish.
-      # needs a cross-repo PAT with Contents: read/write on candy-tools/debian-repo,
-      # stored as the DEBIAN_REPO_TOKEN secret.
-      - name: Register with debian-repo
-        uses: candy-tools/debian-repo/.github/actions/register@main
+      # hand the .deb `make build` wrote into dist/ to the apt job below; a flat
+      # artifact means "every release" of the APT repo.
+      - name: Upload the .deb for the APT repo
+        uses: actions/upload-artifact@v4
         with:
-          name: linux-candy           # must match the .deb's Package field
-          dist-dir: dist              # where `make build` wrote the .deb
-          token: ${{ secrets.DEBIAN_REPO_TOKEN }}
+          name: debs
+          path: dist/*.deb
+          if-no-files-found: error
+
+  # publish to the APT repo. the .deb was attached to the GitHub release above;
+  # the gh-action-debian-repo engine writes packages/linux-candy.json in
+  # candy-tools/debian-repo and pushes it, which triggers that repo's publish.
+  # authenticates as the candy-tools GitHub App (org variable APT_APP_ID +
+  # secret APT_APP_PRIVATE_KEY), which mints a short-lived token scoped to
+  # debian-repo.
+  apt:
+    needs: release
+    permissions:
+      contents: read
+    uses: andresbott/gh-action-debian-repo/.github/workflows/publish.yml@v1.0.0-rc.2
+    with:
+      name: linux-candy           # must match the .deb's Package field
+      artifact: debs
+      collection: candy-tools/debian-repo
+      app-id: ${{ vars.APT_APP_ID }}
+    secrets:
+      app-private-key: ${{ secrets.APT_APP_PRIVATE_KEY }}
